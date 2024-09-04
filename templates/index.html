@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Controller</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <style>
+        #controls {
+            margin-top: 10px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f4f4f4;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Robot Controller</h1>
+    <div>
+        <img src="{{ url_for('video_feed') }}" style="width: 640px; height: 480px;" />
+    </div>
+    <div id="controls">
+        <button class="button" id="up">Move Up</button>
+        <button class="button" id="down">Move Down</button>
+        <button class="button" id="left">Move Left</button>
+        <button class="button" id="right">Move Right</button>
+        <button class="button" id="beep">Beep</button>
+        <button class="button" id="reset">Reset</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const socket = io();
+
+            function sendCommand(command) {
+                socket.emit('command', { command: command });
+            }
+
+            socket.on('response', function(data) {
+                console.log(data);
+            });
+
+            document.getElementById('up').addEventListener('mousedown', function() {
+                sendCommand('UP');
+            });
+
+            document.getElementById('down').addEventListener('mousedown', function() {
+                sendCommand('DOWN');
+            });
+
+            document.getElementById('left').addEventListener('mousedown', function() {
+                sendCommand('LEFT');
+            });
+
+            document.getElementById('right').addEventListener('mousedown', function() {
+                sendCommand('RIGHT');
+            });
+
+            document.getElementById('beep').addEventListener('click', function() {
+                sendCommand('SPACE');
+            });
+
+            document.getElementById('reset').addEventListener('click', function() {
+                sendCommand('R');
+            });
+
+            document.addEventListener('mouseup', function(event) {
+                const key = event.target.id.toUpperCase();
+                if (['UP', 'DOWN', 'LEFT', 'RIGHT'].includes(key)) {
+                    sendCommand(key + '_RELEASE');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
